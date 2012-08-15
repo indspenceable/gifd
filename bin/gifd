@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+# The locations for the User's library and the Default Library
+USER_GIF_LOCATION = '~/.gifs'
+DEFAULT_GIF_LOCATION = File.join(File.dirname(__FILE__), '..', '.gifs')
+
+# Ensure there is a file in the user gif location
+`touch #{USER_GIF_LOCATION}`
+
+COMMAND = ARGV[0]
+DEFAULT_GIFS = Hash[`cat #{DEFAULT_GIF_LOCATION}`.split("\n").map{|g| g.split}]
+USER_GIFS = Hash[`cat #{USER_GIF_LOCATION}`.split("\n").map{|g| g.split}]
+GIFS = DEFAULT_GIFS.merge(USER_GIFS)
+
+# Given a name, check if there is a gif with that name and return it.
+# if not, print out suitable error messages and exit.
+def gif_by_name name
+  gif = GIFS[name]
+  if gif.nil? || gif.empty?
+    $stderr.puts "Sorry, no gif with name #{name}"
+    $stderr.puts "gifs are:"
+    $stderr.puts GIFS.keys.map{|s| "\t#{s}"}.sort.join("\n")
+    exit(1)
+  end
+  gif
+end
+
+case COMMAND
+when "-s"
+  gif_name, gif_url = ARGV[1], ARGV[2]
+
+  USER_GIFS[gif_name] = gif_url
+  `rm #{USER_GIF_LOCATION}`
+  `echo "#{USER_GIFS.to_a.reject{|k,v| v.nil?}.map{|g| g.join(' ')}.join('\n')}" > ~/.gifs`
+when "-o"
+  gif = gif_by_name(ARGV[1])
+  `open #{gif}` if gif
+else # Command is a gif name
+  gif = gif_by_name(COMMAND)
+  `echo #{gif} | tr -d '\n' | pbcopy` if gif
+end
