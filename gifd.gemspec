@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'gifd'
   s.version     = '0.0.2'
-  s.date        = '2012-08-07'
+  s.date        = '2012-08-15'
   s.summary     = "Manage links to gifs."
   s.description = "Allows users to maintain a library of gif locations, and easily copy those to their clipboard/open them in their browser."
   s.authors     = ["Daniel Spencer"]
